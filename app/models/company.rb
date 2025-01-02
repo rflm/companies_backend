@@ -19,6 +19,7 @@ class Company < ApplicationRecord
 
   validates :name, :registration_number, :addresses, presence: true
   validates :registration_number, uniqueness: true
+  validates :name, length: { maximum: 256 }
 
   accepts_nested_attributes_for :addresses
 end

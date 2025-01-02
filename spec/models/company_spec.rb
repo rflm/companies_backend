@@ -25,6 +25,7 @@ RSpec.describe Company, type: :model do
     subject { FactoryBot.build(:company) }
 
     it { should validate_presence_of(:name) }
+    it { should validate_length_of(:name).is_at_most(256) }
     it { should validate_presence_of(:registration_number) }
     it { should validate_presence_of(:addresses) }
     it { should validate_uniqueness_of(:registration_number) }
