@@ -72,6 +72,7 @@ RSpec.describe "Api::V1::Companies", type: :request do
       json = JSON.parse(response.body)
 
       expect(json["data"].size).to eq(2)
+      expect(json["data"].first['addresses'].size).to eq(2)
 
       data = json["data"][0]
 

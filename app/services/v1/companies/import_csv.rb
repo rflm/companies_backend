@@ -6,7 +6,7 @@ class V1::Companies::ImportCsv
   def initialize(file)
     @file = file
     @errors = {}
-    @imported_companies = []
+    @imported_ids = []
   end
 
   def call
@@ -16,7 +16,7 @@ class V1::Companies::ImportCsv
       end
     end
 
-    @imported_companies = @imported_companies.uniq
+    @imported_companies = Company.where(id: @imported_ids)
   end
 
   private
@@ -34,7 +34,7 @@ class V1::Companies::ImportCsv
     )
 
     if company.save
-      imported_companies << company
+      @imported_ids << company.id
     else
       errors[row.to_s.strip] = company.errors
 
