@@ -9,6 +9,18 @@ class Api::V1::CompaniesController < ApplicationController
     end
   end
 
+  def import_csv
+    importer = V1::Companies::ImportCsv.new(params[:file])
+
+    importer.call
+
+    if importer.errors.any?
+      render json: { errors: importer.errors }, status: :unprocessable_entity
+    else
+      render json: V1::CompanyResource.new(importer.imported_companies).serialize, status: :created
+    end
+  end
+
   private
 
   def create_params

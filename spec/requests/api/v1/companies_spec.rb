@@ -50,6 +50,54 @@ RSpec.describe "Api::V1::Companies", type: :request do
     end
   end
 
+  describe "POST /import_csv" do
+    it "creates companies from CSV" do
+      file = fixture_file_upload("v1/companies/valid.csv", "text/csv")
+
+      expect {
+        expect {
+          post import_csv_api_v1_companies_path, params: { file: }
+        }.to change(Company, :count).by(2)
+      }.to change(Address, :count).by(3)
+
+      expect(response).to have_http_status(:created)
+
+      expect(response.body).to include("Example Co")
+      expect(response.body).to include("123456789")
+      expect(response.body).to include("Main St")
+      expect(response.body).to include("New York")
+      expect(response.body).to include("10001")
+      expect(response.body).to include("USA")
+
+      json = JSON.parse(response.body)
+
+      expect(json["data"].size).to eq(2)
+
+      data = json["data"][0]
+
+      expect(data.keys.to_set).to eq(expected_company_keys)
+      expect(data["addresses"].first.keys.to_set).to eq(expected_address_keys)
+    end
+
+    it "returns errors when invalid" do
+      file = fixture_file_upload("v1/companies/invalid.csv", "text/csv")
+
+      expect {
+        expect {
+          post import_csv_api_v1_companies_path, params: { file: file }
+        }.not_to change(Company, :count)
+      }.not_to change(Address, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+
+      json = JSON.parse(response.body)
+
+      expect(json.keys).to eq([ "errors" ])
+      expect(json["errors"]["Another Co,123456789,789 Oak St,Chicago,60601,USA"]['registration_number'])
+        .to include("has already been taken")
+    end
+  end
+
   private
 
   def expected_company_keys

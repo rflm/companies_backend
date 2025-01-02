@@ -10,7 +10,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :companies, only: %i[create]
+      resources :companies, only: %i[create] do
+        post :import_csv, on: :collection
+      end
     end
   end
 end
