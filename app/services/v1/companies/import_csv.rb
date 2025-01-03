@@ -16,7 +16,7 @@ class V1::Companies::ImportCsv
       end
     end
 
-    @imported_companies = Company.where(id: @imported_ids)
+    @imported_companies = Company.where(id: @imported_ids).includes(:addresses)
   end
 
   private
